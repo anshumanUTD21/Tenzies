@@ -19,6 +19,7 @@ export default function App() {
   }
 
   const [dice, setDice] = useState(() => generateAllNewDice());
+  const [totalRoll, setTotalRoll] = useState(0);
   const buttonRef = useRef(null);
   const gameWon =
     dice.every((die) => die.isHeld) &&
@@ -49,15 +50,17 @@ export default function App() {
     ></Die>
   ));
   function handleRollDice() {
-    gameWon
-      ? setDice(generateAllNewDice())
-      : setDice((prevItem) =>
-          prevItem.map((item) =>
-            item.isHeld
-              ? item
-              : { ...item, value: Math.ceil(Math.random() * 6) },
-          ),
-        );
+    if (gameWon) {
+      setTotalRoll(0);
+      setDice(generateAllNewDice());
+    } else {
+      setTotalRoll((prev) => prev + 1); // ✅ fixed
+      setDice((prevItem) =>
+        prevItem.map((item) =>
+          item.isHeld ? item : { ...item, value: Math.ceil(Math.random() * 6) },
+        ),
+      );
+    }
   }
 
   return (
@@ -75,6 +78,7 @@ export default function App() {
           current value between rolls.
         </p>
         <div className="dice-container">{dieElement}</div>
+        <div className="total-roll">{totalRoll}</div>
         <button ref={buttonRef} className="roll-dice" onClick={handleRollDice}>
           {gameWon ? "New Game" : "Roll"}
         </button>
